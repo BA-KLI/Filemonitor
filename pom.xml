@@ -147,7 +147,7 @@
 						<configuration>
 							<headerType>gui</headerType>
 							<headerType>gui</headerType>
-							<outfile>${project.build.directory}/App.exe</outfile>
+							<outfile>${project.build.directory}/Filemonitor.exe</outfile>
 							<jar>${project.build.directory}/${artifactId}-${version}-shaded.jar</jar>
 							<errTitle>App Err</errTitle>
 							<classPath>
