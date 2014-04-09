@@ -155,7 +155,7 @@
 								<preCp>anything</preCp>
 							</classPath>
 							<jre>
-								<minVersion>1.6.0</minVersion>
+								<minVersion>1.7.0</minVersion>
 								<jdkPreference>preferJre</jdkPreference>
 							</jre>
 							<versionInfo>
