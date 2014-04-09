@@ -220,6 +220,7 @@ public class AppWindow extends JFrame {
 				
 				}
 				catch(IOException err){
+					err.printStackTrace();
 					logger.error(err.getMessage());
 				}
 			}

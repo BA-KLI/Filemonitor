@@ -269,6 +269,7 @@ public class CopyMonitor implements MonitorInterface{
                     in.close();
             } catch (IOException e) {
                     e.printStackTrace();
+        			logger.error(e.getMessage());
             }
             return lines;
     }
@@ -292,6 +293,7 @@ public class CopyMonitor implements MonitorInterface{
 			}
 			
 		} catch (IOException e) {
+            e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
@@ -314,6 +316,7 @@ public class CopyMonitor implements MonitorInterface{
 			}
 			
 		} catch (IOException e) {
+            e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
@@ -334,6 +337,7 @@ try {
 			}
 			
 		} catch (IOException e) {
+            e.printStackTrace();
 			logger.error(e.getMessage());
 		}
 	}
