@@ -116,12 +116,12 @@ import javax.swing.text.StyledDocument;
  			if(!logBuffer.isEmpty()) {
  				System.out.println("flushing buffer");
  				Iterator iter = logBuffer.iterator();
- 				while(iter.hasNext()) {					
- 					sDoc.insertString(0, (String)iter.next(), sDoc.getStyle(STYLE_REGULAR));			
+ 				while(iter.hasNext()) {
+ 					sDoc.insertString(sDoc.getLength(), (String)iter.next(), sDoc.getStyle(STYLE_REGULAR));			
  					iter.remove();
  				}
  			}			
- 			sDoc.insertString(0, log, sDoc.getStyle(STYLE_REGULAR));
+ 			sDoc.insertString(sDoc.getLength(), log, sDoc.getStyle(STYLE_REGULAR));
  			} catch(BadLocationException ble) {
  				System.out.println("Bad Location Exception : " + ble.getMessage());
  			}

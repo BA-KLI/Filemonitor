@@ -185,6 +185,11 @@ public class AppWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try{
 				
+
+				logger.info("Adding Copy Monitor");
+				logger.info("Source Path: "+quellPfad.getText());
+				logger.info("Copy Path: "+targetPfad.getText());
+					
 				HashMap<String, Boolean> parameters = new HashMap<String, Boolean>();
 				parameters.put("copyTargetToSource", checkbox_copyTargetToSource.isSelected());
 				
@@ -214,10 +219,8 @@ public class AppWindow extends JFrame {
 				}
 				
 				new Thread(copystarter).start();
-				logger.info("Added Copy Monitor");
-				logger.info("Source Path: "+quellPfad.getText());
-				logger.info("Copy Path: "+targetPfad.getText());
-				
+				logger.info("Copy Monitor started...");
+
 				}
 				catch(IOException err){
 					err.printStackTrace();
