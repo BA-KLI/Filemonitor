@@ -167,7 +167,7 @@
 								<txtProductVersion>1.0.0.0</txtProductVersion>
 								<productName>Product</productName>
 								<internalName>Product</internalName>
-								<originalFilename>App.exe</originalFilename>
+								<originalFilename>Filemonitor.exe</originalFilename>
 							</versionInfo>
 						</configuration>
 					</execution>
