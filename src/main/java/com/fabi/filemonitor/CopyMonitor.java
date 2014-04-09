@@ -151,6 +151,7 @@ public class CopyMonitor implements MonitorInterface{
 		for(Path path : files){
 			Path sourcePath = from.resolve(path);
 			Path targetPath = to.resolve(path);
+			Files.createDirectories(targetPath.getParent());
 			Files.copy(sourcePath, targetPath, COPY_ATTRIBUTES);
 			logger.debug("cp "+sourcePath+" "+targetPath);
 		}
