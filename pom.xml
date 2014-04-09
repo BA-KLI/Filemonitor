@@ -106,7 +106,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>de.fabi.filemonitor.App</mainClass>
+					<mainClass>com.fabi.filemonitor.App</mainClass>
 				</configuration>
 			</plugin>
 
@@ -128,7 +128,7 @@
 					<transformers>
 						<transformer
 							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>de.fabi.filemonitor.App</mainClass>
+							<mainClass>com.fabi.filemonitor.App</mainClass>
 						</transformer>
 					</transformers>
 				</configuration>
@@ -151,7 +151,7 @@
 							<jar>${project.build.directory}/${artifactId}-${version}-shaded.jar</jar>
 							<errTitle>App Err</errTitle>
 							<classPath>
-								<mainClass>de.fabi.filemonitor.App</mainClass>
+								<mainClass>com.fabi.filemonitor.App</mainClass>
 								<preCp>anything</preCp>
 							</classPath>
 							<jre>
