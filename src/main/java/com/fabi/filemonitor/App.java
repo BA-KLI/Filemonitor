@@ -28,8 +28,8 @@ public class App
 	    	  fa.setThreshold(Level.DEBUG);
 	    	  fa.activateOptions();
 	
-	    	  //add appender to any Logger (here is root)
-	    	  Logger.getRootLogger().addAppender(fa);
+	    	//add appender to any Logger (here is root)
+	    	Logger.getRootLogger().addAppender(fa);
         	
 
     		AppWindow theAppWindow = new AppWindow();

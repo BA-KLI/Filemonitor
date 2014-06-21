@@ -1,5 +1,7 @@
 package com.fabi.filemonitor;
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +14,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -193,29 +196,43 @@ public class AppWindow extends JFrame {
 				HashMap<String, Boolean> parameters = new HashMap<String, Boolean>();
 				parameters.put("copyTargetToSource", checkbox_copyTargetToSource.isSelected());
 				
-				CopyMonitorStarter copystarter = new CopyMonitorStarter(quellPfad.getText(), Arrays.asList(targetPfad.getText()),parameters);
+				List<String> targets = Arrays.asList(targetPfad.getText().split(","));
+				CopyMonitorStarter copystarter = new CopyMonitorStarter(quellPfad.getText(),targets,parameters);
 				CopyMonitor copymonitor = copystarter.getCopyMonitor();
 				
 				if(checkbox_copyTargetToSource.isSelected()){
-					String filesInFirstTargetNotInSource = copymonitor.listFilesFromFirstTargetNotInSource();
-					if(askToCopyFiles(targetPfad.getText(),quellPfad.getText(),filesInFirstTargetNotInSource));
-						copymonitor.copyFilesFromFirstTargetNotInSource();
+					ArrayList<String> filesInTargetsNotInSource = copymonitor.listFilesFromTargetsNotInSource();
+					
+					for(int i = 0;i<filesInTargetsNotInSource.size();i++){
+						String files = filesInTargetsNotInSource.get(i);
+						if(askToCopyFiles(targets.get(i),quellPfad.getText(),files))
+							copymonitor.copyFilesFromTargetNotInSource(i);
+					}
 					
 				}
 				
 				
 				if(checkbox_copySourceToTarget.isSelected()){
-					String filesInSourceNotInFirstTarget = copymonitor.listFilesFromSourceNotInFirstTarget();
-					if(askToCopyFiles(quellPfad.getText(),targetPfad.getText(),filesInSourceNotInFirstTarget));
-						copymonitor.copyFilesFromSourceNotInFirstTarget();
+					ArrayList<String> filesInSourcesNotInTarget = copymonitor.listFilesFromSourceNotInTargets();
+					
+
+					for(int i = 0;i<filesInSourcesNotInTarget.size();i++){
+						String files = filesInSourcesNotInTarget.get(i);
+						if(askToCopyFiles(quellPfad.getText(),targets.get(i),files))
+							copymonitor.copyFilesFromSourceNotInTarget(i);
+					}
 					
 				}
 				
-				LinkedHashMap<Path, Patch> diffMap = copymonitor.listFilesDiffsFromSourceToFirstTarget();
+				ArrayList<LinkedHashMap<Path, Patch>> diffMap = copymonitor.listFilesDiffsFromSourcewToTarget();
 				
-				for(Path p : diffMap.keySet()){
-					String diffs = copymonitor.patchToString(p, diffMap.get(p));
-					JOptionPane.showMessageDialog(self, diffs);
+				int i=0;
+				for(LinkedHashMap<Path, Patch> map : diffMap){
+					i++; 
+					for(Path p : map.keySet()){
+						String diffs = "Target "+Integer.toString(i)+": "+ copymonitor.patchToString(p, map.get(p));
+						JOptionPane.showMessageDialog(self, diffs);
+					} 
 				}
 				
 				new Thread(copystarter).start();
@@ -230,7 +247,7 @@ public class AppWindow extends JFrame {
 
 			private boolean askToCopyFiles(String source, String target, String filesStr) {
 
-				String question = "Copy these files from "+targetPfad.getText()+" to "+quellPfad.getText();
+				String question = "Copy these files from "+source+" to "+target;
 				
 				//default icon, custom title
 				int n = JOptionPane.showConfirmDialog(
@@ -264,6 +281,7 @@ public class AppWindow extends JFrame {
 		optionPanel.add(checkbox_copySourceToTarget);
 		buttonPanel.add(button_monitorStarten);
 		final JPanel mainPanel = new JPanel();
+		mainPanel.setMaximumSize(new Dimension(400,400));
 		mainPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -278,15 +296,11 @@ public class AppWindow extends JFrame {
 		c.gridy = 2;
 		c.insets = new Insets(10,0,0,0); 
 		mainPanel.add(buttonPanel,c);
-		c.gridx = 0;
-		c.gridy = 3;
-		c.ipady = 200; 
-		c.ipadx = 400; 
-		c.insets = new Insets(10,0,0,0); 
-		mainPanel.add(SwingAppenderUI.getInstance(),c);
-		this.getContentPane().add(mainPanel);
+		
+		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().add(mainPanel, BorderLayout.NORTH);
+		this.getContentPane().add(SwingAppenderUI.getInstance(), BorderLayout.CENTER);
 		
 		
-		this.pack();
 	}
 }

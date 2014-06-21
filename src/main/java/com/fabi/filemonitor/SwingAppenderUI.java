@@ -9,6 +9,7 @@ package com.fabi.filemonitor;
  */import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -71,7 +72,6 @@ import javax.swing.text.StyledDocument;
       * @return An instance of SwingAppenderUI
       */
      public static SwingAppenderUI getInstance() {
-     	System.out.println("getting UI Instance");
          if (instance == null) {
          	synchronized(SwingAppenderUI.class) {
          		if(instance == null) {
@@ -87,11 +87,10 @@ import javax.swing.text.StyledDocument;
  	 * from outside this class.
  	 */
  	private SwingAppenderUI() {
- 		this.setLayout(new BorderLayout());
- 		this.setSize(400,400);
  		//set internal attributes
  		logBuffer = new ArrayList();
  		appState = STARTED;
+ 		this.setLayout(new GridLayout(1,1));
  		
  		
  		//create text area to hold the log messages
@@ -99,9 +98,10 @@ import javax.swing.text.StyledDocument;
  		//initialize buttons
  		initButtonsPanel();
  		
+ 		
  		//add components to the contentPane
- 		this.add(BorderLayout.NORTH, buttonsPanel);
- 		this.add(BorderLayout.CENTER, scrollPane);
+ 		this.add(scrollPane);
+ 		
  	}
  	
  	/**Displays the log in the text area unless dispMsg is set to false in which
@@ -114,7 +114,6 @@ import javax.swing.text.StyledDocument;
  			try {
  			StyledDocument sDoc = logMessagesDisp.getStyledDocument();
  			if(!logBuffer.isEmpty()) {
- 				System.out.println("flushing buffer");
  				Iterator iter = logBuffer.iterator();
  				while(iter.hasNext()) {
  					sDoc.insertString(sDoc.getLength(), (String)iter.next(), sDoc.getStyle(STYLE_REGULAR));			
@@ -169,10 +168,15 @@ import javax.swing.text.StyledDocument;
  	 */
  	private void initMessageDispArea() {
  		logMessagesDisp = new JTextPane();
- 		logMessagesDisp.setMinimumSize(new Dimension(400,400));
+ 		logMessagesDisp.setAutoscrolls(true);
  		scrollPane = new JScrollPane(logMessagesDisp);
+ 		
+
+ 		
  		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
  		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+ 		
  		//add styles
  		StyledDocument sDoc = logMessagesDisp.getStyledDocument();
  		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);		
@@ -181,7 +185,6 @@ import javax.swing.text.StyledDocument;
  		
  		Style s2 = sDoc.addStyle(STYLE_HIGHLIGHTED, s1);
  		StyleConstants.setBackground(s2, Color.BLUE);
- 		
  	}
  	
  	/**************** inner classes *************************/

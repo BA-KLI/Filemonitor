@@ -38,8 +38,8 @@ public class CopyMonitor implements MonitorInterface{
 	List<Path> targetDirs = new ArrayList<Path>();
 	HashMap<String, Boolean> parameters = new HashMap<String, Boolean>();
 	
-	ArrayList<Path> filesInFirstTargetNotInSource = new ArrayList<Path>();
-	ArrayList<Path> filesInSourceNotInFirstTarget = new ArrayList<Path>();
+	ArrayList<ArrayList<Path>> filesInTargetsNotInSource = new ArrayList<ArrayList<Path>>();
+	ArrayList<ArrayList<Path>> filesInSourceNotInTargets = new ArrayList<ArrayList<Path>>();
 	
 	
 	public CopyMonitor(Path sourceDir, Path targetDir) throws IOException {
@@ -83,10 +83,14 @@ public class CopyMonitor implements MonitorInterface{
 				logger.error("No target is set");
 				return;
 			}
-			Path targetDir = targetDirs.get(0);
 			
-            filesInFirstTargetNotInSource = collectRelativeFilesInSrc1NotPresentInSrc2(targetDir,sourceDir); 
-            filesInSourceNotInFirstTarget = collectRelativeFilesInSrc1NotPresentInSrc2(sourceDir,targetDir); 
+            this.filesInTargetsNotInSource = new ArrayList<ArrayList<Path>>();
+            this.filesInSourceNotInTargets = new ArrayList<ArrayList<Path>>();
+            
+            for(Path targetDir : targetDirs){
+            	this.filesInTargetsNotInSource.add(collectRelativeFilesInSrc1NotPresentInSrc2(targetDir,sourceDir));
+            	this.filesInSourceNotInTargets.add(collectRelativeFilesInSrc1NotPresentInSrc2(sourceDir,targetDir));
+            }
 	}
 
 	/**
@@ -102,17 +106,43 @@ public class CopyMonitor implements MonitorInterface{
 	}
 
 
-	public String listFilesFromFirstTargetNotInSource() throws IOException{
-		return arrayToString(filesInFirstTargetNotInSource);
-	}
-	
-	public String listFilesFromSourceNotInFirstTarget() throws IOException{
-		return arrayToString(filesInSourceNotInFirstTarget);
+	public String listFilesFromTargetNotInSource(int targetno) throws IOException{
+		return arrayToString(filesInTargetsNotInSource.get(targetno));
 	}
 	
 
-	public LinkedHashMap<Path, Patch> listFilesDiffsFromSourceToFirstTarget() throws IOException{
-		return getFileDiffsOfDirectories(sourceDir,targetDirs.get(0));
+	public ArrayList<String> listFilesFromTargetsNotInSource() throws IOException{
+		ArrayList<String> strings = new ArrayList<String>();
+		for(int i=0;i<targetDirs.size();i++){
+			strings.add(listFilesFromTargetNotInSource(i));
+		}
+		return strings;
+	}
+	
+	
+	public String listFilesFromSourceNotInTarget(int targetno) throws IOException{
+		return arrayToString(filesInSourceNotInTargets.get(targetno));
+	}
+	
+
+	public ArrayList<String> listFilesFromSourceNotInTargets() throws IOException{
+		ArrayList<String> strings = new ArrayList<String>();
+		for(int i=0;i<targetDirs.size();i++){
+			strings.add(listFilesFromSourceNotInTarget(i));
+		}
+		return strings;
+	}
+	
+	
+	
+
+	public ArrayList<LinkedHashMap<Path, Patch>> listFilesDiffsFromSourcewToTarget() throws IOException{
+		ArrayList<LinkedHashMap<Path, Patch>> patches = new ArrayList<LinkedHashMap<Path,Patch>>();
+		
+		for(int i=0;i<targetDirs.size();i++)
+			patches.add(getFileDiffsOfDirectories(sourceDir,targetDirs.get(i)));
+		
+		return patches;
 	}
 	
 	public String diffsToString(LinkedHashMap<Path, Patch> diffHashMap){
@@ -133,14 +163,14 @@ public class CopyMonitor implements MonitorInterface{
 	
 	
 	
-	public void copyFilesFromFirstTargetNotInSource() throws IOException{
-		Path targetDir = targetDirs.get(0);
-		copyFiles(targetDir,sourceDir,filesInFirstTargetNotInSource);
+	public void copyFilesFromTargetNotInSource(int targetid) throws IOException{
+		Path targetDir = targetDirs.get(targetid);
+		copyFiles(targetDir,sourceDir,filesInTargetsNotInSource.get(targetid));
 	}
 	
-	public void copyFilesFromSourceNotInFirstTarget() throws IOException{
-		Path targetDir = targetDirs.get(0);
-		copyFiles(sourceDir,targetDir,filesInSourceNotInFirstTarget);
+	public void copyFilesFromSourceNotInTarget(int targetid) throws IOException{
+		Path targetDir = targetDirs.get(targetid);
+		copyFiles(sourceDir,targetDir,filesInSourceNotInTargets.get(targetid));
 	}
 	
 	
