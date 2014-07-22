@@ -42,8 +42,6 @@ public class TargetFileWatcher  implements MonitorInterface{
 	 */
 	public void monitorFileModify(Path file){
 
-		logger.debug("source:"+sourcePath);
-		logger.debug("file:"+file);
 
 		if(file.startsWith(targetPath) && 
 		   !Files.isDirectory(file)){
@@ -53,10 +51,8 @@ public class TargetFileWatcher  implements MonitorInterface{
 			
 			
 			try {
-				String source = FileUtils.readFileToString(newPathSource.toFile());
-				String target = FileUtils.readFileToString(newPathTarget.toFile());
-			
-				if(!source.equals(target)){
+
+                if(!FileUtils.contentEquals(newPathSource.toFile(),newPathTarget.toFile())){
 
 					logger.debug("Target modified");
 						
@@ -64,11 +60,14 @@ public class TargetFileWatcher  implements MonitorInterface{
 					logger.debug("Pfad 2 : "+newPathTarget.toString());
 					
 					logger.debug("Target content:");
-					logger.debug(target);
+					logger.debug(FileUtils.readFileToString(newPathTarget.toFile()));
 					logger.debug("End Target content--");
 					
+					File backup = new File(newPathSource.toFile().getAbsolutePath()+".bak");
+					FileUtils.copyFile(newPathSource.toFile(), backup);
+                    FileUtils.copyFile(newPathTarget.toFile(), newPathSource.toFile());
 						
-					JOptionPane.showMessageDialog(App.window, subPath+" got Modified in target "+targetPath+". Consider to copy it.");
+					JOptionPane.showMessageDialog(App.window, subPath+" got Modified in target "+targetPath+". Copied the target to your source and made a backup of the source to "+backup);
 					
 			
 					java.awt.EventQueue.invokeLater(new Runnable() {

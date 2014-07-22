@@ -114,7 +114,6 @@ public class DirectoryMonitor {
                 Path child = dir.resolve(name);
 
                 // print out event
-                logger.debug(event.kind().name()+": "+child);
                 if(event.kind() == ENTRY_CREATE)
                 	monitorer.monitorFileCreate(child);
                 if(event.kind() == ENTRY_MODIFY)

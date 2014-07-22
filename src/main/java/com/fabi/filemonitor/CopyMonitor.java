@@ -346,12 +346,13 @@ public class CopyMonitor implements MonitorInterface{
 				Path subPath = sourceDir.relativize(file);
 				for(Path targetDir : targetDirs){
 					Path newPath = targetDir.resolve(subPath);
-					Files.createDirectories(newPath.getParent());
-					logger.info("cp "+file.toString()+" "+newPath.toString());
-					logger.info("replacing: \n"+FileUtils.readFileToString(new File(newPath.toString())));
-					logger.info(".........");
 					
-					Files.copy(file, newPath, REPLACE_EXISTING);
+					if(!newPath.toFile().exists() || !FileUtils.contentEquals(newPath.toFile(),file.toFile())){
+    					Files.createDirectories(newPath.getParent());
+    					logger.info("cp "+file.toString()+" "+newPath.toString());
+    					new File(newPath.toString()).setWritable(true);
+    					Files.copy(file, newPath, REPLACE_EXISTING);
+					}
 				}
 			}
 			
