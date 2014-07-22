@@ -230,8 +230,25 @@ public class AppWindow extends JFrame {
 				for(LinkedHashMap<Path, Patch> map : diffMap){
 					i++; 
 					for(Path p : map.keySet()){
-						String diffs = "Target "+Integer.toString(i)+": "+ copymonitor.patchToString(p, map.get(p));
-						JOptionPane.showMessageDialog(self, diffs);
+						
+
+						String text = "Difference betweeen "+quellPfad.getText()+" und "+targets.get(i-1);
+						String diffs = copymonitor.patchToString(p, map.get(p));
+
+						logger.debug("\n\n\n");
+						
+						text += "\nFile "+p;
+						
+						JOptionPane.showMessageDialog(null, text+"\n"+(diffs.length() < 1000 ? diffs : diffs.substring(0, 1000)+"..."));
+
+						logger.debug(text);
+						logger.debug("\n");
+						
+
+						
+						logger.debug("------------------------------------------------------------");
+						logger.debug(diffs);
+						logger.debug("------------------------------------------------------------");
 					} 
 				}
 				
@@ -302,5 +319,9 @@ public class AppWindow extends JFrame {
 		this.getContentPane().add(SwingAppenderUI.getInstance(), BorderLayout.CENTER);
 		
 		
+	}
+
+	public void showMessage(String message){
+		JOptionPane.showMessageDialog(null, "Test");
 	}
 }

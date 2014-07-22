@@ -7,6 +7,7 @@ import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -22,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import difflib.Delta;
@@ -102,6 +105,7 @@ public class CopyMonitor implements MonitorInterface{
 		
 		for(Path path : array)
 			s += path.toString()+"\n";
+
 		return s;
 	}
 
@@ -142,6 +146,8 @@ public class CopyMonitor implements MonitorInterface{
 		for(int i=0;i<targetDirs.size();i++)
 			patches.add(getFileDiffsOfDirectories(sourceDir,targetDirs.get(i)));
 		
+
+		
 		return patches;
 	}
 	
@@ -156,8 +162,10 @@ public class CopyMonitor implements MonitorInterface{
 
 	public String patchToString(Path path, Patch patch){
 		String s = path.toString()+" differs:\n";
-		for(Delta d : patch.getDeltas())
-			s+= d.toString()+"\n";
+		for(Delta d : patch.getDeltas()){
+			s+= StringUtils.trim(d.toString())+"\n";
+		}
+
 		return s;
 	}
 	
@@ -180,7 +188,7 @@ public class CopyMonitor implements MonitorInterface{
 			Path sourcePath = from.resolve(path);
 			Path targetPath = to.resolve(path);
 			Files.createDirectories(targetPath.getParent());
-			Files.copy(sourcePath, targetPath, COPY_ATTRIBUTES);
+			Files.copy(sourcePath, targetPath);
 			logger.debug("cp "+sourcePath+" "+targetPath);
 		}
 		
@@ -293,7 +301,7 @@ public class CopyMonitor implements MonitorInterface{
             try {
                     BufferedReader in = new BufferedReader(new FileReader(filename));
                     while ((line = in.readLine()) != null) {
-                            lines.add(line);
+                            lines.add(line+"\n");
                     }
                     in.close();
             } catch (IOException e) {
@@ -317,7 +325,7 @@ public class CopyMonitor implements MonitorInterface{
 					Files.createDirectories(newPath.getParent());
 					logger.info("cp "+file.toString()+" "+newPath.toString());
 					
-					Files.copy(file, newPath, COPY_ATTRIBUTES);
+					Files.copy(file, newPath);
 				}
 			}
 			
@@ -333,14 +341,17 @@ public class CopyMonitor implements MonitorInterface{
 	public void monitorFileModify(Path file) {
 		try {
 			
-			if(file.startsWith(sourceDir) && !Files.isDirectory(file)){
+			if(file.startsWith(sourceDir) && 
+			   !Files.isDirectory(file)){
 				Path subPath = sourceDir.relativize(file);
 				for(Path targetDir : targetDirs){
 					Path newPath = targetDir.resolve(subPath);
 					Files.createDirectories(newPath.getParent());
 					logger.info("cp "+file.toString()+" "+newPath.toString());
+					logger.info("replacing: \n"+FileUtils.readFileToString(new File(newPath.toString())));
+					logger.info(".........");
 					
-					Files.copy(file, newPath, REPLACE_EXISTING, COPY_ATTRIBUTES);
+					Files.copy(file, newPath, REPLACE_EXISTING);
 				}
 			}
 			
@@ -354,7 +365,7 @@ public class CopyMonitor implements MonitorInterface{
 	 * @see com.fabi.filemonitor.MonitorInterface#monitorFileDelete(java.nio.file.Path)
 	 */
 	public void monitorFileDelete(Path file) {
-try {
+		try {
 			
 			if(file.startsWith(sourceDir)){
 				Path subPath = sourceDir.relativize(file);

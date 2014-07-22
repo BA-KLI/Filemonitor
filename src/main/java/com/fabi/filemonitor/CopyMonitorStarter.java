@@ -4,9 +4,11 @@
 package com.fabi.filemonitor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.math.linear.Array2DRowFieldMatrix;
 import org.apache.log4j.Logger;
 
 /**
@@ -21,7 +23,7 @@ public class CopyMonitorStarter implements Runnable {
 	private HashMap<String, Boolean> parameters = new HashMap<String, Boolean>();
 	
 	private CopyMonitor copyMonitor;
-	
+	List<TargetFileWatcher> targetMonitors = new ArrayList<TargetFileWatcher>();
 
 	/**
 	 * @param parameters 
@@ -33,6 +35,14 @@ public class CopyMonitorStarter implements Runnable {
 		this.parameters = parameters;
 		try {
 			copyMonitor = new CopyMonitor(quellPfad, targetPfade,parameters);
+
+			logger.info("creating source");
+			targetMonitors = new ArrayList<TargetFileWatcher>();
+			for(String targetPfad : targetPfade){
+				this.targetMonitors.add(new TargetFileWatcher(quellPfad, targetPfad));
+			}
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -42,12 +52,42 @@ public class CopyMonitorStarter implements Runnable {
 	
 	public void run() {
 
-		try {
-			new DirectoryMonitor(copyMonitor).processEvents();
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
+
+			
+			
+			
+			new Thread(new Runnable() {
+				
+				public void run() {
+					try {
+						logger.debug("creating source monitor");
+						new DirectoryMonitor(copyMonitor).processEvents();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}).start();
+			
+
+			logger.debug("creating target monitor");
+
+			new Thread(new Runnable() {
+				
+				public void run() {
+					try {
+						for(TargetFileWatcher targetFileWatcher  : targetMonitors){
+							new DirectoryMonitor(targetFileWatcher).processEvents();
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+			}).start();
+			
 	}
 	
 

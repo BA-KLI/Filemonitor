@@ -10,9 +10,11 @@ import org.apache.log4j.PatternLayout;
 
 public class App 
 {
+	
+	public static AppWindow window;
+	
     public static void main(String[] args) throws IOException {
 
-        
         if(args.length == 2){
             // Set up a simple configuration that logs on the console.
             BasicConfigurator.configure();
@@ -32,10 +34,10 @@ public class App
 	    	Logger.getRootLogger().addAppender(fa);
         	
 
-    		AppWindow theAppWindow = new AppWindow();
-    		theAppWindow.setVisible(true);
+	    	App.window = new AppWindow();
+	    	App.window.setVisible(true);
 
-    		theAppWindow.setSize(800, 600);
+	    	App.window.setSize(800, 600);
         }
     }
 }
